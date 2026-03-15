@@ -1,0 +1,6 @@
+# Runtime-generated workspace files
+**/workspace-layout.generated.conf
+**/workspaces.generated.jsonc
+
+# Optional logs / temp files
+*.log
