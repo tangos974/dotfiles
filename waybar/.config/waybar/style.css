@@ -54,9 +54,18 @@
 #battery,
 #pulseaudio,
 #bluetooth,
+#custom-vortix,
 #network {
   min-width: 12px;
   margin: 0 6px;
+}
+
+#custom-vortix.disconnected {
+  opacity: 0.45;
+}
+
+#custom-vortix.connected {
+  color: alpha(@foreground, 1);
 }
 
 #custom-omarchy,

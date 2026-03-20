@@ -11,6 +11,7 @@
   "modules-center": ["hyprland/window", "clock", "custom/update", "custom/voxtype", "custom/screenrecording-indicator", "custom/idle-indicator", "custom/notification-silencing-indicator"],
   "modules-right": [
     "group/tray-expander",
+    "custom/vortix",
     "memory",
     "custom/memory-swap",
     "custom/disk",
@@ -105,14 +106,21 @@
       "󰋊▇",
       "󰋊█"
     ],
-    "on-click": "xdg-terminal-exec --app-id=TUI.float -e bash -lc 'cd / && dust -r; read -n 1 -s'",
-    "on-click-right": "xdg-terminal-exec --app-id=TUI.float -e /home/tang/dotfiles/bin/csud"
+    "on-click": "setsid uwsm-app -- xdg-terminal-exec --app-id=TUI.float -e bash -lc 'cd / && dust -r; read -n 1 -s'",
+    "on-click-right": "setsid uwsm-app -- xdg-terminal-exec --app-id=TUI.float -e /home/tang/dotfiles/bin/csud"
   },
   "clock": {
     "format": "{:L%A %H:%M}",
     "format-alt": "{:L%d %B W%V %Y}",
     "tooltip": false,
     "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
+  },
+  "custom/vortix": {
+    "interval": 5,
+    "return-type": "json",
+    "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/vortix-status.sh\"'",
+    "format": "{text}",
+    "on-click": "setsid uwsm app -- ghostty --class=TUI.float -e bash -lc 'exec sudo vortix'"
   },
   "network": {
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],

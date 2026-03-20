@@ -18,29 +18,7 @@ die() {
 
 [ -d "$DOTFILES_DIR" ] || die "Expected dotfiles at ${DOTFILES_DIR} (parent of bin/)."
 
-# Stow refuses to replace a regular file with a symlink. Omarchy (or manual copies) often
-# ship the same paths as plain files — move them aside like *.before-stow elsewhere.
-backup_stow_file_conflicts() {
-  pkg="$1"
-  pkg_root="${DOTFILES_DIR}/${pkg}"
-  prefix="${pkg_root}/"
-  [ -d "$pkg_root" ] || return 0
-  find "$pkg_root" -type f | while IFS= read -r src; do
-    rel="${src#$prefix}"
-    target="${HOME}/${rel}"
-    if [ -e "$target" ] && [ ! -L "$target" ] && [ ! -e "${target}.before-stow" ]; then
-      mv "$target" "${target}.before-stow"
-      printf 'Backed up conflicting file for stow: %s -> %s.before-stow\n' "$target" "$target"
-    fi
-  done
-}
-
-stow_pkg() {
-  pkg="$1"
-  [ -d "${DOTFILES_DIR}/${pkg}" ] || return 0
-  backup_stow_file_conflicts "$pkg"
-  (cd "$DOTFILES_DIR" && stow -v -t "$HOME" "$pkg")
-}
+. "$SCRIPT_DIR/dotfiles-stow.sh"
 
 echo "==> stow (package)"
 "$SCRIPT_DIR/install-stow.sh"
@@ -51,9 +29,18 @@ echo "==> Browser (Mullvad) + stow hypr / uwsm / omarchy-bin"
 echo "==> Stow waybar"
 stow_pkg waybar
 
+echo "==> Bash (~/.bashrc)"
+"$SCRIPT_DIR/install-bash.sh"
+
 echo "==> Terminal: Kitty + tree"
 "$SCRIPT_DIR/install-kitty.sh"
 "$SCRIPT_DIR/install-tree.sh"
+
+echo "==> Kubernetes (kubectl, kubectx, k9s)"
+"$SCRIPT_DIR/install-kubernetes-tools.sh"
+
+echo "==> Vortix (VPN TUI)"
+"$SCRIPT_DIR/install-vortix.sh"
 
 echo "==> Ghostty (Omarchy terminal install + dotfiles config)"
 "$SCRIPT_DIR/install-ghostty.sh"
