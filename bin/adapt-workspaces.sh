@@ -78,6 +78,4 @@ PY
 hyprctl reload
 
 # Restart Waybar
-pkill waybar 2>/dev/null || true
-nohup waybar >/tmp/waybar.log 2>&1 &
-
+hyprctl reload >/dev/null 2>&1 || true

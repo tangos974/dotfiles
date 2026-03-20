@@ -1,0 +1,13 @@
+#!/bin/sh
+
+browser="$(xdg-settings get default-web-browser 2>/dev/null || true)"
+
+case "$browser" in
+  mullvad-browser* )
+    exec setsid uwsm app -- mullvad-browser --no-remote -P "WebApps" --new-window --class WebApp "$1" "${@:2}"
+    ;;
+  * )
+    browser="chromium.desktop"
+    exec setsid uwsm app -- "$(sed -n 's/^Exec=\([^ ]*\).*/\1/p' {~/.local,~/.nix-profile,/usr}/share/applications/$browser 2>/dev/null | head -1)" --app="$1" "${@:2}"
+    ;;
+esac

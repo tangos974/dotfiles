@@ -1,0 +1,35 @@
+/* ---- Mullvad default (all profiles except WebApps): remove padding around content ---- */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+/* Remove padding/margin around the main content area */
+#browser,
+#content-deck,
+#tabbrowser-tabpanels {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:root {
+  --tab-min-height: 15px !important;
+}
+
+#TabsToolbar,
+#nav-bar,
+#PersonalToolbar {
+  min-height: 15px !important;
+}
+
+.toolbarbutton-1 {
+  padding-block: 0px !important;
+}
+
+#urlbar,
+#searchbar {
+  min-height: 15px !important;
+}
+
+.notificationbox-stack,
+notification-message {
+  display: none !important;
+}

@@ -1,0 +1,27 @@
+---
+description: When touching existing Omarchy config files, use .before-stow + dotfiles copy (never edit in place)
+globs: "**/.config/**"
+alwaysApply: false
+---
+
+# Dotfiles + Omarchy: Never Edit Omarchy Config In Place
+
+When we need to change a config file that **already exists on the system** (e.g. created by Omarchy and not yet in this dotfiles repo), do **not** edit it directly.
+
+## The 3-step workflow
+
+1. **On the system (live config):** Make a copy of the original file in the **same directory**, appending `.before-stow` to its name.  
+   Example: `~/.config/hypr/windows.conf` → `~/.config/hypr/windows.conf.before-stow`
+
+2. **In this project (dotfiles):** Add a copy of the file in the **same path under the stow package**.  
+   Example: copy into `hypr/.config/hypr/windows.conf` in this repo. We will **modify this copy**.
+
+3. **On the system:** Replace the live file with a **symlink** to the file in the dotfiles directory (so Stow can manage it, or so the file is the one from the repo).  
+   Example: `~/.config/hypr/windows.conf` → symlink to `~/dotfiles/hypr/.config/hypr/windows.conf` (or ensure `stow hypr` is run so the symlink is created by Stow).
+
+After that, all edits happen only in the dotfiles project; the live system uses the file from the repo (via symlink / Stow).
+
+## When this applies
+
+- Any file under `~/.config/` that is **shipped by Omarchy** (or another source) and we want to version and customize in this repo.
+- If the file is **already only in the dotfiles repo** (e.g. our `looknfeel.conf`), we **edit it directly** in the repo; no .before-stow step needed.

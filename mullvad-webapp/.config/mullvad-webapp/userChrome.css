@@ -1,0 +1,20 @@
+/* ---- Mullvad WebApp Minimal Mode ---- */
+
+/* Hide tabs, address bar, bookmarks, menu bar, status bar, sidebar, titlebar */
+#TabsToolbar,
+#nav-bar,
+#PersonalToolbar,
+#statuspanel,
+#sidebar-box,
+#titlebar {
+  visibility: collapse !important;
+}
+
+/* Menu bar appears when ALT or F10 is pressed */
+:root[sizemode="normal"] #toolbar-menubar {
+  visibility: collapse !important;
+}
+
+#toolbar-menubar[autohide="false"] {
+  visibility: visible !important;
+}

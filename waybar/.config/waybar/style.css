@@ -46,9 +46,19 @@
   border-bottom: 2px solid transparent;
 }
 
+/* Uniform horizontal rhythm for right-side status modules (avoids tight CPU↔BT / wide BT↔WiFi). */
 #cpu,
+#memory,
+#custom-memory-swap,
+#custom-disk,
 #battery,
 #pulseaudio,
+#bluetooth,
+#network {
+  min-width: 12px;
+  margin: 0 6px;
+}
+
 #custom-omarchy,
 #custom-update {
   min-width: 12px;
@@ -56,19 +66,11 @@
 }
 
 #tray {
-  margin-right: 16px;
-}
-
-#bluetooth {
-  margin-right: 17px;
-}
-
-#network {
-  margin-right: 13px;
+  margin: 0 6px;
 }
 
 #custom-expand-icon {
-  margin-right: 18px;
+  margin: 0 6px;
 }
 
 tooltip {
@@ -113,4 +115,38 @@ tooltip {
 
 #custom-voxtype.recording {
   color: #a55555;
+}
+
+#custom-memory-swap.warning {
+  color: alpha(@foreground, 0.9);
+}
+
+#custom-memory-swap.critical {
+  color: #a55555;
+}
+
+#custom-memory-swap.noswap {
+  opacity: 0.4;
+}
+
+#custom-disk.warning {
+  color: alpha(@foreground, 0.9);
+}
+
+#custom-disk.critical {
+  color: #a55555;
+}
+
+#custom-disk.unreadable {
+  opacity: 0.4;
+}
+
+#window {
+  margin-left: 10px;
+  margin-right: 10px;
+  color: @foreground;
+}
+
+window#waybar.empty #window {
+  opacity: 0.45;
 }

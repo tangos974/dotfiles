@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# ncdu, short name for muscle memory / typos
+if [ "$#" -eq 0 ]; then
+  exec ncdu /
+else
+  exec ncdu "$@"
+fi
