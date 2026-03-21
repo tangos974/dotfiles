@@ -1,0 +1,3 @@
+#!/bin/bash
+# Floating TUI window (Hyprland rules for class TUI.float). Ghostty flags match omarchy-launch-tui.
+exec setsid uwsm app -- ghostty --gtk-single-instance=false --class=TUI.float -e "$1" "${@:2}"

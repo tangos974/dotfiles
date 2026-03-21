@@ -22,7 +22,7 @@
 #workspaces button {
   all: initial;
   padding: 0 6px;
-  margin: 0 1.5px;
+  margin: 0 2px;
   min-width: 9px;
 }
 
@@ -46,18 +46,32 @@
   border-bottom: 2px solid transparent;
 }
 
-/* Uniform horizontal rhythm for right-side status modules (avoids tight CPU↔BT / wide BT↔WiFi). */
+/* One horizontal rhythm: 4px each side → 8px between neighbors (left, center icons, right). */
+#custom-omarchy,
+#custom-update,
+#clock,
+#custom-voxtype,
+#custom-screenrecording-indicator,
+#custom-idle-indicator,
+#custom-notification-silencing-indicator,
 #cpu,
 #memory,
 #custom-memory-swap,
 #custom-disk,
 #battery,
 #pulseaudio,
+#custom-mic,
 #bluetooth,
 #custom-vortix,
-#network {
-  min-width: 12px;
-  margin: 0 6px;
+#network,
+#tray,
+#custom-expand-icon {
+  min-width: 10px;
+  margin: 0 4px;
+}
+
+#custom-mic.muted {
+  opacity: 0.5;
 }
 
 #custom-vortix.disconnected {
@@ -68,20 +82,6 @@
   color: alpha(@foreground, 1);
 }
 
-#custom-omarchy,
-#custom-update {
-  min-width: 12px;
-  margin: 0 7.5px;
-}
-
-#tray {
-  margin: 0 6px;
-}
-
-#custom-expand-icon {
-  margin: 0 6px;
-}
-
 tooltip {
   padding: 2px;
 }
@@ -90,8 +90,10 @@ tooltip {
   font-size: 10px;
 }
 
+/* Window title sits directly before clock in modules-center — extra inset + rule so they read as two fields */
 #clock {
-  margin-left: 8.75px;
+  margin-left: 14px;
+  padding-left: 12px;
 }
 
 .hidden {
@@ -101,9 +103,6 @@ tooltip {
 #custom-screenrecording-indicator,
 #custom-idle-indicator,
 #custom-notification-silencing-indicator {
-  min-width: 12px;
-  margin-left: 5px;
-  margin-right: 0;
   font-size: 10px;
   padding-bottom: 1px;
 }
@@ -115,11 +114,6 @@ tooltip {
 #custom-idle-indicator.active,
 #custom-notification-silencing-indicator.active {
   color: #a55555;
-}
-
-#custom-voxtype {
-  min-width: 12px;
-  margin: 0 0 0 7.5px;
 }
 
 #custom-voxtype.recording {
@@ -151,8 +145,7 @@ tooltip {
 }
 
 #window {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 0 4px;
   color: @foreground;
 }
 

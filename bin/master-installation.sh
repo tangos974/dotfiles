@@ -39,6 +39,9 @@ echo "==> Terminal: Kitty + tree"
 echo "==> Kubernetes (kubectl, kubectx, k9s)"
 "$SCRIPT_DIR/install-kubernetes-tools.sh"
 
+echo "==> Jolt (battery / power TUI)"
+"$SCRIPT_DIR/install-jolt.sh"
+
 echo "==> Vortix (VPN TUI)"
 "$SCRIPT_DIR/install-vortix.sh"
 
