@@ -5,3 +5,6 @@ user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 user_pref("privacy.resistFingerprinting.letterboxing", false);
 
 user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+
+user_pref("ui.systemUsesDarkTheme", 1);
+user_pref("layout.css.prefers-color-scheme.content-override", 0);
