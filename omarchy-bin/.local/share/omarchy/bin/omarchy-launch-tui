@@ -1,0 +1,4 @@
+#!/bin/bash
+# Dotfiles override: avoid Ghostty GTK single-instance stealing focus / wrong class.
+# Stowed to ~/.local/share/omarchy/bin/omarchy-launch-tui (see install-mullvad-browser.sh).
+exec setsid ghostty --gtk-single-instance=false --class=org.omarchy.$(basename "$1") -e "$1" "${@:2}"

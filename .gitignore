@@ -1,0 +1,3 @@
+# Stow conflict backups (never commit — real files live without this suffix)
+**/*.before-stow
+**/*.before-stow.*

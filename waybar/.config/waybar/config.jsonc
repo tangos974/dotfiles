@@ -1,6 +1,6 @@
 {
   "include": [
-    "/home/tang/.config/waybar/workspaces.generated.jsonc"
+    "~/.config/waybar/workspaces.generated.jsonc"
   ],
   "reload_style_on_change": true,
   "layer": "top",
@@ -75,7 +75,7 @@
   },
   "custom/memory-swap": {
     "interval": 5,
-    "exec": "/home/tang/.config/waybar/scripts/memory-swap-icon.sh",
+    "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/memory-swap-icon.sh\"'",
     "return-type": "json",
     "format": "{icon}",
     "format-icons": [
@@ -93,7 +93,7 @@
   },
   "custom/disk": {
     "interval": 30,
-    "exec": "/home/tang/.config/waybar/scripts/disk-usage-icon.sh",
+    "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/disk-usage-icon.sh\"'",
     "return-type": "json",
     "format": "{icon}",
     "format-icons": [
@@ -106,8 +106,8 @@
       "󰋊▇",
       "󰋊█"
     ],
-    "on-click": "setsid uwsm-app -- xdg-terminal-exec --app-id=TUI.float -e bash -lc 'cd / && dust -r; read -n 1 -s'",
-    "on-click-right": "setsid uwsm-app -- xdg-terminal-exec --app-id=TUI.float -e /home/tang/dotfiles/bin/csud"
+    "on-click": "omarchy-launch-tui bash -lc 'cd / && dust -r; read -n 1 -s'",
+    "on-click-right": "omarchy-launch-tui bash -lc 'exec \"$HOME/dotfiles/bin/csud\"'"
   },
   "clock": {
     "format": "{:L%A %H:%M}",

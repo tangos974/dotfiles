@@ -1,6 +1,8 @@
 #!/bin/sh
+set -e
 
-DOTFILES_DIR="${HOME}/dotfiles"
+SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"
+DOTFILES_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 HYPR_PKG_DIR="${DOTFILES_DIR}/hypr/.config/hypr"
 UWSM_PKG_DIR="${DOTFILES_DIR}/uwsm/.config/uwsm"
 
@@ -23,9 +25,13 @@ REPO_OMARCHY_WEBAPP="${OMARCHY_BIN_REPO_DIR}/omarchy-launch-webapp"
 REPO_OMARCHY_FOCUS_WEBAPP="${OMARCHY_BIN_REPO_DIR}/omarchy-launch-or-focus-webapp"
 
 backup_if_needed() {
-  local path="$1"
-  if [ -e "$path" ] && [ ! -L "$path" ] && [ ! -e "${path}.before-stow" ]; then
-    mv "$path" "${path}.before-stow"
+  path="$1"
+  if [ -e "$path" ] && [ ! -L "$path" ]; then
+    dest="${path}.before-stow"
+    if [ -e "$dest" ]; then
+      dest="${path}.before-stow.$(date +%s)"
+    fi
+    mv "$path" "$dest"
   fi
 }
 
@@ -34,8 +40,8 @@ ensure_parent_dirs() {
 }
 
 copy_live_to_repo_if_missing() {
-  local live="$1"
-  local repo="$2"
+  live="$1"
+  repo="$2"
 
   if [ ! -e "$repo" ]; then
     if [ -e "$live" ]; then
@@ -56,7 +62,8 @@ install_browser() {
 }
 
 set_default_browser() {
-  xdg-settings set default-web-browser mullvad-browser.desktop
+  # Often fails when uwsm/session sets $BROWSER; we still set it in ~/.config/uwsm/default below.
+  xdg-settings set default-web-browser mullvad-browser.desktop || true
 
   if grep -q '^export BROWSER=' "$REPO_UWSM_DEFAULT" 2>/dev/null; then
     sed -i 's|^export BROWSER=.*$|export BROWSER=mullvad-browser|g' "$REPO_UWSM_DEFAULT"
@@ -92,10 +99,10 @@ update_bindings_conf() {
 }
 
 stow_configs() {
-  cd "$DOTFILES_DIR"
-  stow -v -t ~ hypr
-  stow -v -t ~ uwsm
-  stow -v -t ~ omarchy-bin
+  . "$SCRIPT_DIR/dotfiles-stow.sh"
+  stow_pkg hypr
+  stow_pkg uwsm
+  stow_pkg omarchy-bin
 }
 
 main() {
