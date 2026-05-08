@@ -42,10 +42,20 @@ backup_stow_file_conflicts() {
 
       mkdir -p "$(dirname "$backup")"
 
-      if [ ! -e "$backup" ]; then
-        mv -- "$target" "$backup"
-        printf "Backed up conflicting file for stow: %s -> %s\n" "$target" "$backup"
+      # If a backup already exists, decide what to do without leaving the live
+      # file in place — otherwise stow would refuse to link it and abort the
+      # entire package (silently breaking sibling files like bindings.conf).
+      if [ -e "$backup" ]; then
+        if cmp -s "$target" "$backup"; then
+          rm -f -- "$target"
+          printf "Dropped redundant target (matches existing backup): %s\n" "$target"
+          exit 0
+        fi
+        backup="${backup}.$(date +%s)"
       fi
+
+      mv -- "$target" "$backup"
+      printf "Backed up conflicting file for stow: %s -> %s\n" "$target" "$backup"
     ' _ "$prefix" "$HOME" "$backup_root" {} \;
 }
 
