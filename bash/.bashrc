@@ -7,6 +7,11 @@ source ~/.local/share/omarchy/default/bash/shell
 source ~/.local/share/omarchy/default/bash/aliases
 source ~/.local/share/omarchy/default/bash/functions
 
+# Custom omarchy overrides — stowed from ~/dotfiles/omarchy-bin/. Prepended so
+# they shadow upstream commands in ~/.local/share/omarchy/bin/ without polluting
+# that git working tree (which previously broke omarchy-update).
+export PATH="$HOME/.local/share/omarchy-overrides/bin:$PATH"
+
 __omarchy_cache_dir="$HOME/.cache/omarchy/bash"
 mkdir -p "$__omarchy_cache_dir"
 

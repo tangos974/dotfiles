@@ -1,0 +1,5 @@
+#!/bin/bash
+# Dotfiles override: Ghostty + org.omarchy.terminal (Hyprland tiling rules) instead of xdg-terminal-exec.
+cmd="$*"
+exec setsid uwsm-app -- ghostty --gtk-single-instance=false --class=org.omarchy.terminal \
+  -e bash -lc "omarchy-show-logo; $cmd; status=\$?; if (( status != 130 )); then omarchy-show-done; fi; exit \$status"

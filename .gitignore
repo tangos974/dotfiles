@@ -1,3 +1,9 @@
 # Stow conflict backups (never commit — real files live without this suffix)
 **/*.before-stow
 **/*.before-stow.*
+
+# Git merge-conflict-marker debris (when a bad resolution turns the marker
+# line into a filename — never commit these)
+**/*~Updated upstream
+**/*~Stashed changes
+**/*~HEAD
