@@ -17,10 +17,11 @@
     "custom/disk",
     "cpu",
     "bluetooth",
+    "custom/keyboard-layout",
     "network",
     "custom/mic",
     "pulseaudio",
-    "battery"
+    "custom/battery"
   ],
   "hyprland/workspaces": {
     "on-click": "activate",
@@ -136,25 +137,16 @@
     "spacing": 1,
     "on-click": "omarchy-launch-wifi"
   },
-  "battery": {
-    "format": "{capacity}% {icon}",
-    "format-discharging": "{icon}",
-    "format-charging": "{icon}",
-    "format-plugged": "",
-    "format-icons": {
-      "charging": ["󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"],
-      "default": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
-    },
-    "format-full": "󰂅",
-    "tooltip-format-discharging": "{power:>1.0f}W↓ {capacity}%",
-    "tooltip-format-charging": "{power:>1.0f}W↑ {capacity}%",
+  "custom/battery": {
+    "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/battery-with-powerprofile.sh\"'",
+    "return-type": "json",
     "interval": 5,
+    "signal": 14,
+    "format": "{}",
+    "tooltip": true,
     "on-click": "omarchy-menu power",
     "on-click-right": "omarchy-launch-floating-tui jolt",
-    "states": {
-      "warning": 20,
-      "critical": 10
-    }
+    "on-click-middle": "/bin/bash -lc 'cur=$(powerprofilesctl get); case \"$cur\" in performance) powerprofilesctl set balanced ;; balanced) powerprofilesctl set power-saver ;; *) powerprofilesctl set performance ;; esac; pkill -RTMIN+14 waybar'"
   },
   "bluetooth": {
     "format": "",
@@ -164,6 +156,14 @@
     "format-no-controller": "",
     "tooltip-format": "Devices connected: {num_connections}",
     "on-click": "omarchy-launch-bluetooth"
+  },
+  "custom/keyboard-layout": {
+    "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/keyboard-layout-status.sh\"'",
+    "interval": 2,
+    "signal": 13,
+    "format": "{}",
+    "tooltip": false,
+    "on-click": "omarchy-launch-floating-tui $HOME/.config/waybar/scripts/keyboard-layout-menu.sh"
   },
   "custom/mic": {
     "return-type": "json",

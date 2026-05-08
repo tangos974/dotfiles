@@ -58,11 +58,12 @@
 #memory,
 #custom-memory-swap,
 #custom-disk,
-#battery,
+#custom-battery,
 #pulseaudio,
 #custom-mic,
 #bluetooth,
 #custom-vortix,
+#custom-keyboard-layout,
 #network,
 #tray,
 #custom-expand-icon {
@@ -77,6 +78,7 @@
 #custom-vortix.disconnected {
   opacity: 0.45;
 }
+
 
 #custom-vortix.connected {
   color: alpha(@foreground, 1);
