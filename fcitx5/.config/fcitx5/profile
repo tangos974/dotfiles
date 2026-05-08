@@ -1,0 +1,29 @@
+[Groups/0]
+# Group Name
+Name=Default
+# Layout
+Default Layout=gb
+# Default Input Method
+DefaultIM=keyboard-us
+
+[Groups/0/Items/0]
+# Name
+Name=keyboard-gb-intl
+# Layout
+Layout="gb (intl)"
+
+[Groups/0/Items/1]
+# Name
+Name=keyboard-us
+# Layout
+Layout=us
+
+[Groups/0/Items/2]
+# Name
+Name=keyboard-fr
+# Layout
+Layout=fr
+
+[GroupOrder]
+0=Default
+
