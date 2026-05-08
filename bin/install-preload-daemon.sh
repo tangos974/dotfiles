@@ -6,6 +6,10 @@
 set -euo pipefail
 
 install_pkg() {
+  if pacman -Qq preload >/dev/null 2>&1; then
+    echo "preload already installed — skipping AUR step."
+    return 0
+  fi
   if command -v omarchy-pkg-aur-add >/dev/null 2>&1; then
     omarchy-pkg-aur-add preload
   elif command -v yay >/dev/null 2>&1; then

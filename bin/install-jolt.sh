@@ -2,6 +2,11 @@
 # Jolt — TUI battery and power monitor (Arch extra).
 set -e
 
+if command -v jolt >/dev/null 2>&1; then
+  echo "jolt already installed — skipping."
+  exit 0
+fi
+
 if command -v yay >/dev/null 2>&1; then
   yay -S --needed --noconfirm jolt
 elif command -v pacman >/dev/null 2>&1; then

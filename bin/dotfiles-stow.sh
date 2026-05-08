@@ -1,6 +1,21 @@
 #!/bin/sh
 # Shared helpers for stowing dotfiles packages. Expects DOTFILES_DIR to be set.
 
+# Move a non-symlink file aside before symlinking something in its place.
+# For files inside a stow package, prefer stow_pkg() — it backs up conflicts
+# automatically into ~/.local/state/dotfiles-stow-backups/. Use this helper
+# only for ad-hoc symlinks outside any stow package (e.g. ln -sfn into a
+# Mozilla profile directory).
+backup_if_needed() {
+  path="$1"
+  [ -e "$path" ] || return 0
+  [ -L "$path" ] && return 0
+  dest="${path}.before-stow"
+  [ -e "$dest" ] && dest="${path}.before-stow.$(date +%s)"
+  mv -- "$path" "$dest"
+  printf 'Backed up: %s -> %s\n' "$path" "$dest"
+}
+
 backup_stow_file_conflicts() {
   pkg="$1"
   pkg_root="${DOTFILES_DIR}/${pkg}"

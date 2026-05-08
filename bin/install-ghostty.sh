@@ -7,23 +7,26 @@
 set -euo pipefail
 
 DOTFILES_DIR="${HOME}/dotfiles"
+SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"
 GHOSTTY_DESKTOP_USER="${HOME}/.local/share/applications/com.mitchellh.ghostty.desktop"
 LIVE_GHOSTTY_CONFIG="${HOME}/.config/ghostty/config"
 
-backup_if_needed() {
-  local path="$1"
-  if [[ -e "$path" && ! -L "$path" && ! -e "${path}.before-stow" ]]; then
-    mv "$path" "${path}.before-stow"
-    printf 'Backed up for stow: %s -> %s.before-stow\n' "$path" "$path"
+# shellcheck source=dotfiles-stow.sh
+. "${SCRIPT_DIR}/dotfiles-stow.sh"
+
+stow_ghostty_omarchy_integration() {
+  if [ ! -d "${DOTFILES_DIR}/omarchy-bin/.local/share/omarchy-overrides/bin" ] ||
+    [ ! -f "${DOTFILES_DIR}/omarchy/.config/omarchy/extensions/menu.sh" ]; then
+    return 0
   fi
+  mkdir -p "${HOME}/.config/omarchy/extensions"
+  stow_pkg omarchy-bin
+  stow_pkg omarchy
 }
 
 ensure_ghostty_config() {
   mkdir -p "${HOME}/.config/ghostty"
-  if [ -d "${DOTFILES_DIR}/ghostty/.config/ghostty" ]; then
-    backup_if_needed "$LIVE_GHOSTTY_CONFIG"
-    (cd "${DOTFILES_DIR}" && stow -v -t "${HOME}" ghostty)
-  fi
+  stow_pkg ghostty
   if [ ! -f "$LIVE_GHOSTTY_CONFIG" ] && [ -n "${OMARCHY_PATH:-}" ] && [ -f "${OMARCHY_PATH}/config/ghostty/config" ]; then
     cp "${OMARCHY_PATH}/config/ghostty/config" "$LIVE_GHOSTTY_CONFIG"
   fi
@@ -72,7 +75,12 @@ main() {
   fi
 
   ensure_ghostty_config
-  omarchy-install-terminal ghostty
+  stow_ghostty_omarchy_integration
+  if command -v ghostty >/dev/null 2>&1; then
+    echo "Ghostty already installed — skipping omarchy-install-terminal."
+  else
+    omarchy-install-terminal ghostty
+  fi
   install_desktop_override
 
   systemctl --user enable --now app-com.mitchellh.ghostty.service
@@ -91,6 +99,7 @@ main() {
   echo "  Preload: systemctl --user enable --now app-com.mitchellh.ghostty.service"
   echo "  Config: quit-after-last-window-closed = false (~/.config/ghostty/config)"
   echo "  Desktop: ${GHOSTTY_DESKTOP_USER} (Exec uses +new-window)"
+  echo "  Omarchy: stow omarchy-bin + omarchy (Ghostty menu + presentation terminal) if present in dotfiles."
   echo "  Removed alacritty package if omarchy-pkg-drop succeeded."
 }
 

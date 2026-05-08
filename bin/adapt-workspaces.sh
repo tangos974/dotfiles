@@ -75,7 +75,6 @@ for mon in names:
     print(f"  {mon}: {assignment[mon]}")
 PY
 
-hyprctl reload
-
-# Restart Waybar
 hyprctl reload >/dev/null 2>&1 || true
+# Note: waybar restart is handled by watch-monitor-events.sh on monitor changes.
+# On initial boot, waybar starts after this script generates the config, so no restart needed.

@@ -44,7 +44,11 @@ configure_resolved() {
 
 main() {
 
-  pkg_install vortix wireguard-tools systemd-resolvconf openvpn
+  if need_cmd vortix && need_cmd wg-quick && need_cmd openvpn; then
+    echo "vortix + wireguard-tools + openvpn already installed — skipping package step."
+  else
+    pkg_install vortix wireguard-tools systemd-resolvconf openvpn
+  fi
 
   cleanup_old_hacks
   sudo systemctl daemon-reload

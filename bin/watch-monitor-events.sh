@@ -11,7 +11,7 @@ socat -U - UNIX-CONNECT:"$SOCK" | while IFS= read -r line; do
   case "$line" in
     monitoradded*|monitorremoved*)
       echo "$(date) :: rerunning adapt-workspaces" >> "$LOG"
-      "$HOME/adapt-workspaces.sh" >> "$LOG" 2>&1
+      "$HOME/.local/bin/adapt-workspaces.sh" >> "$LOG" 2>&1
       pkill -x waybar >/dev/null 2>&1 || true
       sleep 0.2
       nohup waybar >/tmp/waybar.log 2>&1 &
