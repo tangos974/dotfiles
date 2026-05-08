@@ -107,3 +107,9 @@ fi
 bind -f ~/.local/share/omarchy/default/bash/inputrc
 
 unset __omarchy_cache_dir __mise_cache __starship_cache __zoxide_cache __try_cache
+
+# Show fastfetch on new interactive shells, but skip when the terminal is too
+# narrow/short — the default Arch logo wraps below ~80 cols and looks broken.
+if (( ${COLUMNS:-0} >= 90 && ${LINES:-0} >= 24 )); then
+  fastfetch
+fi
