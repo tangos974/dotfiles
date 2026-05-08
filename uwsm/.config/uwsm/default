@@ -13,3 +13,10 @@ export EDITOR=nvim
 # export OMARCHY_SCREENRECORD_DIR="$HOME/Videos/Screencasts"
 
 export BROWSER=mullvad-browser
+
+# Custom omarchy overrides — stowed from ~/dotfiles/omarchy-bin/. Prepended so
+# Hypr-launched processes (omarchy-menu TUIs, keybinds, waybar on-clicks)
+# resolve omarchy-launch-tui etc. to the override before the stock command,
+# which uses xdg-terminal-exec --app-id and fails with a D-Bus activation
+# error. Bashrc has the same prepend for interactive shells.
+export PATH="$HOME/.local/share/omarchy-overrides/bin:$PATH"
