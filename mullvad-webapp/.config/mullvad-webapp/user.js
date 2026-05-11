@@ -22,3 +22,10 @@ user_pref("browser.startup.page", 0);
 user_pref("browser.sessionstore.resume_from_crash", false);
 user_pref("browser.sessionstore.resume_session_once", false);
 user_pref("browser.sessionstore.max_resumed_crashes", 0);
+
+/* Memory/cache reduction (pairs with Auto Tab Discard) */
+user_pref("browser.cache.disk.enable", false);
+user_pref("browser.cache.memory.enable", false);
+user_pref("network.prefetch-next", false);
+user_pref("browser.sessionhistory.max_total_viewers", 0);
+user_pref("browser.sessionstore.max_tabs_undo", 5);

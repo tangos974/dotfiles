@@ -24,6 +24,10 @@
       "{b9acf540-acba-11e1-8ccb-001fd0e08bd4}": {
         "installation_mode": "force_installed",
         "install_url": "https://addons.mozilla.org/firefox/downloads/latest/easy-youtube-video-download/latest.xpi"
+      },
+      "{c2c003ee-bd69-42a2-b0e9-6f34222cb046}": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/auto-tab-discard/latest.xpi"
       }
     },
     "ExtensionUpdate": true
