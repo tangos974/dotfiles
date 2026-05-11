@@ -18,8 +18,9 @@ user_pref("browser.privatebrowsing.autostart", false);
 user_pref("browser.sessionstore.interval", 600000);
 
 /* Memory/cache reduction (pairs with Auto Tab Discard) */
-user_pref("browser.cache.disk.enable", false);
-user_pref("browser.cache.memory.enable", false);
+/* Explicit =true to undo a prior user.js that set these to false (prefs.js persists). */
+user_pref("browser.cache.disk.enable", true);
+user_pref("browser.cache.memory.enable", true);
 user_pref("network.prefetch-next", false);
 user_pref("browser.sessionhistory.max_total_viewers", 0);
 user_pref("browser.sessionstore.max_tabs_undo", 5);
