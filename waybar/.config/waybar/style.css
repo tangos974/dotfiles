@@ -154,3 +154,14 @@ tooltip {
 window#waybar.empty #window {
   opacity: 0.45;
 }
+
+#custom-weather {
+  margin-left: 7.5px;
+  margin-right: 7.5px;
+}
+
+#custom-weather.unavailable {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
