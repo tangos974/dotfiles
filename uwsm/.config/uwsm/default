@@ -12,7 +12,11 @@ export EDITOR=nvim
 # Use a custom directory for screenrecordings (remember to make the directory!)
 # export OMARCHY_SCREENRECORD_DIR="$HOME/Videos/Screencasts"
 
-export BROWSER=mullvad-browser
+# Route web-conferencing links to Brave, everything else to Mullvad. The
+# router maps back to mullvad-browser-webrouter.desktop via xdg-settings, so
+# omarchy-launch-webapp's `mullvad-browser*` glob still keeps webapps on
+# Mullvad. See dotfiles/bin/web-browser-router.sh.
+export BROWSER=web-browser-router.sh
 
 # Custom omarchy overrides — stowed from ~/dotfiles/omarchy-bin/. Prepended so
 # Hypr-launched processes (omarchy-menu TUIs, keybinds, waybar on-clicks)
