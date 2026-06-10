@@ -88,6 +88,9 @@ echo "  -> systemd-logind lid + sleep drop-ins (suspend-then-hibernate)"
 echo "  -> Preload daemon (system-wide AUR readahead service)"
 "$SCRIPT_DIR/install-preload-daemon.sh"
 
+echo "  -> sched_ext interactive scheduler (scx_bpfland, anti-stutter)"
+"$SCRIPT_DIR/install-scx-scheduler.sh"
+
 echo "  -> Hyprland exec-once helpers (-> ~/.local/bin/)"
 mkdir -p "$HOME/.local/bin"
 for f in adapt-workspaces.sh watch-monitor-events.sh; do
