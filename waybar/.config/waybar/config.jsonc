@@ -11,6 +11,7 @@
   "modules-center": ["hyprland/window", "clock", "custom/update", "custom/voxtype", "custom/screenrecording-indicator", "custom/idle-indicator", "custom/notification-silencing-indicator"],
   "modules-right": [
     "group/tray-expander",
+    "custom/display",
     "custom/vortix",
     "memory",
     "custom/memory-swap",
@@ -123,6 +124,11 @@
     "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/vortix-status.sh\"'",
     "format": "{text}",
     "on-click": "omarchy-launch-floating-tui bash -lc 'exec sudo vortix'"
+  },
+  "custom/display": {
+    "format": "",
+    "on-click": "uwsm-app -- sh -c 'nwg-displays; \"$HOME/.local/bin/adapt-workspaces.sh\"; omarchy restart waybar'",
+    "tooltip-format": "Arrange displays\n\nDrag/rotate physical screens (nwg-displays).\nWorkspaces re-map left→right (1-3 / 4-6 / 7-10) after you close it."
   },
   "network": {
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],

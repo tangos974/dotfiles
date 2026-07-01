@@ -47,6 +47,7 @@
 }
 
 /* One horizontal rhythm: 4px each side → 8px between neighbors (left, center icons, right). */
+#custom-display,
 #custom-omarchy,
 #custom-update,
 #clock,
