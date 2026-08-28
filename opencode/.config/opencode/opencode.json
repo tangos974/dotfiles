@@ -7,14 +7,12 @@
       "mode": "all"
     },
     "browser": {
-      "description": "Browses web pages with a headless Playwright Chromium. Use for JS-heavy sites (Reddit, SPAs) that webfetch can't render, or when the user asks to browse a URL.",
+      "description": "Browses web pages with a stealthy, headful Camoufox (anti-bot resistant) via the stealth MCP. Use for JS-heavy sites (Reddit, SPAs) that webfetch can't render, sites that block datacenter/headless browsers, or when the user asks to browse a URL.",
       "prompt": "{file:./prompts/browser.txt}",
       "tools": {
-        "playwright*": true,
         "stealth*": true
       },
       "permission": {
-        "playwright*": "allow",
         "stealth*": "allow"
       }
     },
@@ -39,25 +37,10 @@
       },
       "enabled": true
     },
-    "playwright-headless": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@playwright/mcp@0.0.79",
-        "--browser",
-        "chromium",
-        "--headless",
-        "--isolated",
-        "--output-dir",
-        "/tmp/opencode"
-      ],
-      "enabled": true
-    },
     "stealth": {
       "type": "remote",
-      "url": "http://192.168.20.31:7717/mcp",
-      "enabled": false
+      "url": "http://192.168.20.34:7717/mcp",
+      "enabled": true
     }
   },
   "provider": {
@@ -107,6 +90,6 @@
     }
   },
   "tools": {
-    "playwright*": false
+    "stealth*": false
   }
 }
