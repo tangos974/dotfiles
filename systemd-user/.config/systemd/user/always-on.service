@@ -1,0 +1,27 @@
+[Unit]
+Description=Always-on mode (block idle, sleep and lid-close handling)
+Documentation=man:systemd-inhibit(1) man:logind.conf(5)
+
+# Deliberately NO [Install] section, so this unit can never be enabled at boot.
+# Always-on is a temporary, opt-in state: after a reboot or re-login the machine
+# is always back in normal sleep mode.
+
+[Service]
+# One systemd-inhibit process holds a single block-mode lock for its whole
+# lifetime; stopping the unit kills it and releases the lock instantly.
+#
+#   idle              -> hypridle pauses every listener (screensaver, lock,
+#                        dpms off, suspend-then-hibernate). hypridle honours
+#                        this because general:ignore_systemd_inhibit is false.
+#   sleep             -> logind refuses suspend/hibernate requests.
+#   handle-lid-switch -> logind ignores the lid switch. This is a "low level"
+#                        lock, which logind honours regardless of
+#                        LidSwitchIgnoreInhibited (which defaults to yes).
+Type=exec
+ExecStart=/usr/bin/systemd-inhibit \
+    --what=idle:sleep:handle-lid-switch \
+    --who="Always-on mode" \
+    --why="Long-running task must not be interrupted" \
+    --mode=block \
+    /usr/bin/sleep infinity
+Restart=no

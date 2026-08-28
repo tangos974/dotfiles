@@ -47,6 +47,7 @@
 }
 
 /* One horizontal rhythm: 4px each side → 8px between neighbors (left, center icons, right). */
+#custom-always-on,
 #custom-display,
 #custom-omarchy,
 #custom-update,
@@ -74,6 +75,22 @@
 
 #custom-mic.muted {
   opacity: 0.5;
+}
+
+/* Battery <10% and discharging: hard red↔white blink.
+   Near-adjacent keyframes instead of steps() — GTK's CSS handles this everywhere. */
+@keyframes battery-blink-critical {
+  0%    { color: #cc5555; }
+  49.9% { color: #cc5555; }
+  50%   { color: #ffffff; }
+  100%  { color: #ffffff; }
+}
+
+#custom-battery.critical {
+  animation-name: battery-blink-critical;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 #custom-vortix.disconnected {
@@ -117,6 +134,16 @@ tooltip {
 #custom-idle-indicator.active,
 #custom-notification-silencing-indicator.active {
   color: #a55555;
+}
+
+/* Always-on: closed eye dimmed = normal sleep, open eye full white = machine kept awake */
+#custom-always-on.sleeping {
+  opacity: 0.45;
+}
+
+#custom-always-on.active {
+  color: @foreground;
+  opacity: 1;
 }
 
 #custom-voxtype.recording {

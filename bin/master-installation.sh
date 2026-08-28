@@ -39,6 +39,9 @@ echo "==> [0/4] Prerequisites"
 echo "  -> GNU Stow"
 "$SCRIPT_DIR/install-stow.sh"
 
+echo "  -> mise + pinned runtimes (node@lts, go, python, uv)"
+"$SCRIPT_DIR/install-mise.sh"
+
 # ---------------------------------------------------------------------------
 # 1) Packages + base config stows
 #    Each script installs its tool (skipping if already present) and stows the
@@ -81,6 +84,9 @@ if command -v systemctl >/dev/null 2>&1; then
   # systemctl --user try-restart app-com.mitchellh.ghostty.service 2>/dev/null || true
   # We don't want to restart the terminal if itś the one running the script
 fi
+
+echo "  -> OpenCode config + stealth-fetch skill (config only; binary installed separately)"
+"$SCRIPT_DIR/setup-opencode.sh"
 
 echo "  -> systemd-logind lid + sleep drop-ins (suspend-then-hibernate)"
 "$SCRIPT_DIR/setup-systemd-lid-sleep.sh"

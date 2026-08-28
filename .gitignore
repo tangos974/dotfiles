@@ -1,3 +1,11 @@
+# Runtime-generated workspace files
+**/workspace-layout.generated.conf
+**/workspaces.generated.jsonc
+
+# Optional logs / temp files
+*.log
+
+
 # Stow conflict backups (never commit — real files live without this suffix)
 **/*.before-stow
 **/*.before-stow.*
@@ -7,3 +15,9 @@
 **/*~Updated upstream
 **/*~Stashed changes
 **/*~HEAD
+
+# Claude files
+**/claude_notes/**
+
+# Monitor live files
+**/monitors.conf

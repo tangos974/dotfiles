@@ -32,12 +32,14 @@ CAP=$(cat "$BAT/capacity" 2>/dev/null || echo 0)
 STATUS=$(cat "$BAT/status" 2>/dev/null || echo Unknown)
 AC=$(ac_online | head -1)
 
-# Same icon arrays the stock battery module used.
+# Same icon arrays the stock battery module used (bolt-in-battery charging look).
+# On AC the charging variant is always shown, even when the battery reports
+# "Not charging" (e.g. held at a charge threshold) — no separate plug glyph.
 charging_icons=("󰢜" "󰂆" "󰂇" "󰂈" "󰢝" "󰂉" "󰢞" "󰂊" "󰂋" "󰂅")
 default_icons=( "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹")
+empty_icon="󰂎"
+empty_charging_icon="󰢟"
 full_icon="󰂅"
-# format-plugged glyph (fontawesome plug U+F1E6) — keep verbatim from old config.
-printf -v plugged_icon '\xef\x87\xa6'
 
 idx=$(( CAP / 10 ))
 [ "$idx" -gt 9 ] && idx=9
@@ -45,12 +47,12 @@ idx=$(( CAP / 10 ))
 
 if [ "$STATUS" = "Full" ] || [ "$CAP" -ge 100 ]; then
   bat_icon="$full_icon"
-elif [ "$STATUS" = "Charging" ]; then
+elif [ "$STATUS" = "Charging" ] || { [ "$AC" = "1" ] && [ "$STATUS" != "Discharging" ]; }; then
   bat_icon="${charging_icons[$idx]}"
-elif [ "$AC" = "1" ] && [ "$STATUS" != "Discharging" ]; then
-  bat_icon="$plugged_icon"
+  [ "$CAP" -lt 10 ] && bat_icon="$empty_charging_icon"
 else
   bat_icon="${default_icons[$idx]}"
+  [ "$CAP" -lt 10 ] && bat_icon="$empty_icon"
 fi
 
 PROFILE=$(powerprofilesctl get 2>/dev/null || echo balanced)
@@ -63,7 +65,7 @@ esac
 # Warning/critical class so any existing CSS keeps working.
 state_class=""
 if [ "$STATUS" = "Discharging" ]; then
-  if   [ "$CAP" -le 10 ]; then state_class=" critical"
+  if   [ "$CAP" -lt 10 ]; then state_class=" critical"
   elif [ "$CAP" -le 20 ]; then state_class=" warning"
   fi
 fi

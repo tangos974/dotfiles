@@ -29,7 +29,8 @@ The master script is idempotent — re-run it after pulling upstream and every s
 | `systemd-user/`    | `~/.config/systemd/user/`            | Drop-ins for user systemd services (Ghostty preload, UI CPU priority)       |
 | `uwsm/`            | `~/.config/uwsm/`                    | uwsm session env (default browser, editor, terminal)                        |
 | `waybar/`          | `~/.config/waybar/`                  | Waybar config, style, and custom-module scripts                             |
-| `bin/`             | (not stowed — invoked directly)      | All the install / setup / runtime scripts                                   |
+| `bin/`             | (not stowed — invoked directly)      | All the install / setup / runtime scripts                                   || `opencode/`        | `~/.config/opencode/`                | OpenCode agent config (see [OpenCode](#opencode)): default model + homelab llama-swap provider, custom agents, SearXNG MCP server, and agent prompts. Runtime state (`opencode.db`, `node_modules/`, …) is gitignored. |
+| `mise/`            | `~/.config/mise/`                    | [mise](https://mise.jdx.dev) tool pins: `node` on the LTS line; `go`/`python`/`uv`/`terraform`/`ansible-core` tracking `latest`. Shell activation lives in `bash/.bashrc`; `install-mise.sh` installs mise + the tools. node from here provides the `npx` the Playwright MCP needs. |
 
 ## `bin/` script naming
 
@@ -61,6 +62,18 @@ Two scripts run via `exec-once` from `hypr/.config/hypr/hyprland.conf` and live 
 - `adapt-workspaces.sh` — generates `~/.config/hypr/workspace-layout.generated.conf` and `~/.config/waybar/workspaces.generated.jsonc` based on the current monitor layout, then reloads Hyprland and Waybar. Distributes the 10 workspaces across detected monitors with the remainder weighted to the rightmost monitor.
 - `watch-monitor-events.sh` — listens to the Hyprland event socket (`activelayout`, `monitoradded`, `monitorremoved`) and reruns `adapt-workspaces.sh` whenever monitors change.
 
+## Always-on mode
+
+The eye icon in Waybar switches the machine between two power behaviours. A dimmed closed eye is normal omarchy idling; an open, highlighted eye is always-on, where nothing is allowed to interrupt a long-running task. Normal sleep is always the default — the state is deliberately not persisted, so a reboot or re-login lands back in it.
+
+Always-on is a single `systemd-inhibit` block lock, held for as long as `systemd-user/.config/systemd/user/always-on.service` runs. It names three inhibitor types because three independent subsystems can each stop this machine:
+
+- `idle` — hypridle pauses every listener in `hypr/.config/hypr/hypridle.conf` (screensaver at 5 min, lock, display off, suspend-then-hibernate at 10 min). It honours the lock because `general:ignore_systemd_inhibit` defaults to `false`.
+- `sleep` — logind refuses suspend and hibernate, including a manual request from the power menu.
+- `handle-lid-switch` — logind ignores the lid, overriding the `HandleLidSwitch=suspend-then-hibernate` drop-in from `setup-systemd-lid-sleep.sh`. This is a *low level* lock, which logind honours unconditionally; `LidSwitchIgnoreInhibited` defaults to `yes` and would otherwise make the lid discard plain `sleep`/`idle` locks.
+
+The unit has no `[Install]` section, so it cannot be enabled at boot. Stopping it kills the one `sleep infinity` child and releases the lock immediately — there is no saved state to restore, and `systemd-inhibit --list` shows the lock while it is held. The Waybar module is the usual oneshot poll (`always-on-status.sh`, `interval: 10`, `signal: 12`); `always-on-toggle.sh` starts or stops the unit, notifies, and signals the bar to redraw at once.
+
 ## UI CPU priority
 
 Under CPU load (builds, browser tabs, video encode) the default scheduler treats Hyprland like any other process, so the compositor misses frame deadlines and every monitor stutters — which wrecks video calls. uwsm already puts the compositor (plus pipewire/wireplumber) in `session.slice` and regular apps in `app.slice/app-graphical.slice`; the `systemd-user` package adds slice drop-ins that turn that placement into actual priority:
@@ -83,6 +96,20 @@ Three profiles are defined by the dotfiles: **Perso** (default), **Easier**, **W
 - `mullvad-policies/policies.json` — extension/policy settings shared by all profiles, copied (sudo) into `/opt/mullvad-browser/distribution/` by `setup-mullvad-policies.sh`.
 
 `setup-mullvad-profiles.sh` aborts if the browser is running, then renames any pre-existing random-prefix profile dirs (`xxxxxxxx.Easier`, `*.default-release`, …) to the deterministic names — preserving browsing data — before linking the templates.
+
+## Runtimes (mise)
+
+Language runtimes and CLI tools are pinned with [mise](https://mise.jdx.dev). The pins live in the `mise/` package (`~/.config/mise/config.toml`): `node` tracks the LTS line, while `go`, `python`, `uv`, `terraform`, and `ansible-core` (pipx backend) track `latest`. `latest` trades exact reproducibility for freshness — a fresh clone installs whatever is newest then, and `mise upgrade` bumps in place. `lts` is a node-only keyword; the others have no LTS line, so `latest` (or a fixed version) is the equivalent. Shell activation is already wired in `bash/.bashrc`. `install-mise.sh` installs mise (pacman, else yay, else `mise.run`), stows the pins, and runs `mise install`; it is a phase-0 prerequisite because later steps depend on it — notably the Playwright MCP, whose `npx` comes from this node. `kubectl`/`kubectx`/`k9s` are installed separately via `install-kubernetes-tools.sh` (pacman), not mise.
+
+## OpenCode
+
+[OpenCode](https://opencode.ai) is the terminal AI agent configured for the homelab; the `opencode/` package stows into `~/.config/opencode/`. Only hand-authored config is tracked — the 1 GB+ `opencode.db`, `node_modules/`, logs and snapshots live under `~/.local/share/opencode/` and stay machine-local. `setup-opencode.sh` stows the package and wires the skill link; the `opencode` binary itself is installed separately.
+
+- **Provider + model** — a `homelab` provider in `opencode.json` points at the llama-swap endpoint on the LAN and defaults to a local Qwen3 model, so no cloud key is needed (the `apiKey` there is a local llama-swap placeholder, not a secret).
+- **Agents** — three custom agents (`explore`, `browser`, `research`), each with a system prompt under `prompts/` and scoped tool permissions.
+- **Web search** — `mcp/searxng_mcp.py` is a zero-dependency MCP stdio server fronting the homelab SearXNG; it backs the `websearch` tool the agents use instead of guessing URLs.
+- **Browser (Playwright)** — the `browser` agent drives headless Chromium via the `playwright` MCP (`npx @playwright/mcp`, version-pinned). Only the registration is in `opencode.json`; node (provided by mise) and the Chromium binaries in `~/.cache/ms-playwright` are large/mutable and not committed. `install-playwright.sh` (invoked by `setup-opencode.sh`) fetches them — the principle: track the install step, not the artifact.
+- **Stealth browser** — runs as a **remote MCP served from the homelab** (Camoufox in a container), not on this desktop. It's registered in `opencode.json` as a `type: remote` server and allowed on the `browser` agent, but `enabled: false` with a placeholder URL until the homelab service exists — see `~/Homelab/stealth_browser_todo.md`. It replaces the old local Camoufox fetcher for bot-walled pages (Reddit / Cloudflare) that the headless Playwright `browser` agent gets blocked on.
 
 ## Stow conflict handling
 

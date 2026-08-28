@@ -1,0 +1,112 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "model": "homelab/qwen3.8-27b-fast",
+  "agent": {
+    "explore": {
+      "mode": "all"
+    },
+    "browser": {
+      "description": "Browses web pages with a headless Playwright Chromium. Use for JS-heavy sites (Reddit, SPAs) that webfetch can't render, or when the user asks to browse a URL.",
+      "prompt": "{file:./prompts/browser.txt}",
+      "tools": {
+        "playwright*": true,
+        "stealth*": true
+      },
+      "permission": {
+        "playwright*": "allow",
+        "stealth*": "allow"
+      }
+    },
+    "research": {
+      "description": "Researches topics on the web via the homelab SearXNG metasearch engine plus webfetch. Use for questions needing current or external information (docs, versions, CVEs, news, comparisons): it finds sources, reads them, and returns a cited synthesis.",
+      "prompt": "{file:./prompts/research.txt}",
+      "permission": {
+        "searxng_websearch": "allow",
+        "webfetch": "allow"
+      }
+    }
+  },
+  "mcp": {
+    "searxng": {
+      "type": "local",
+      "command": [
+        "/usr/bin/python3",
+        "/home/tang/.config/opencode/mcp/searxng_mcp.py"
+      ],
+      "environment": {
+        "SEARXNG_URL": "http://192.168.20.31:8888"
+      },
+      "enabled": true
+    },
+    "playwright-headless": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@0.0.79",
+        "--browser",
+        "chromium",
+        "--headless",
+        "--isolated",
+        "--output-dir",
+        "/tmp/opencode"
+      ],
+      "enabled": true
+    },
+    "stealth": {
+      "type": "remote",
+      "url": "http://192.168.20.31:7717/mcp",
+      "enabled": false
+    }
+  },
+  "provider": {
+    "homelab": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Homelab llama-swap",
+      "options": {
+        "baseURL": "http://192.168.20.30:8080/v1",
+        "apiKey": "sk-llama-swap-local"
+      },
+      "models": {
+        "qwen3.8-27b": {
+          "name": "Qwen3.8-27B UD-Q5_K_XL (local, vision)",
+          "tools": true,
+          "attachment": true,
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "limit": {
+            "context": 65536,
+            "output": 16384
+          },
+          "options": {
+            "reasoningEffort": "medium"
+          }
+        },
+        "qwen3.8-27b-fast": {
+          "name": "Qwen3.8-27B IQ4_XS+MTP 128k (local, fast)",
+          "tools": true,
+          "attachment": true,
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "limit": {
+            "context": 131072,
+            "output": 16384
+          },
+          "options": {
+            "reasoningEffort": "medium"
+          }
+        },
+        "qwen3.6-35b-heretic": {
+          "name": "Qwen3.6-35B-A3B Heretic (uncensored, local)",
+          "tools": true,
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          }
+        }
+      }
+    }
+  },
+  "tools": {
+    "playwright*": false
+  }
+}

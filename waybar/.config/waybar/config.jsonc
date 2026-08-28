@@ -11,6 +11,7 @@
   "modules-center": ["hyprland/window", "clock", "custom/update", "custom/voxtype", "custom/screenrecording-indicator", "custom/idle-indicator", "custom/notification-silencing-indicator"],
   "modules-right": [
     "group/tray-expander",
+    "custom/always-on",
     "custom/display",
     "custom/vortix",
     "memory",
@@ -124,6 +125,15 @@
     "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/vortix-status.sh\"'",
     "format": "{text}",
     "on-click": "omarchy-launch-floating-tui bash -lc 'exec sudo vortix'"
+  },
+  "custom/always-on": {
+    "interval": 10,
+    "signal": 12,
+    "return-type": "json",
+    "exec": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/always-on-status.sh\"'",
+    "format": "{}",
+    "tooltip": false,
+    "on-click": "/bin/bash -lc 'exec \"$HOME/.config/waybar/scripts/always-on-toggle.sh\"'"
   },
   "custom/display": {
     "format": "",

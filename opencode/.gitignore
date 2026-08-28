@@ -1,0 +1,12 @@
+# OpenCode writes runtime/generated files into ~/.config/opencode alongside the
+# tracked config. Only opencode.json, tui.json, mcp/, and prompts/ are managed
+# here; everything below is machine-local state and must never be committed.
+node_modules/
+package.json
+package-lock.json
+bun.lock
+*.bak
+*.tui-migration.bak
+skills/
+# Large mutable state lives under ~/.local/share/opencode (opencode.db, logs,
+# snapshots, tool-output) — outside this package, so it is excluded by location.

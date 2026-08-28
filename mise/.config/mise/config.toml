@@ -1,0 +1,7 @@
+[tools]
+ansible-core = "latest"
+go = "latest"
+node = "lts"
+python = "latest"
+terraform = "latest"
+uv = "latest"
