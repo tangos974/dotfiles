@@ -63,6 +63,7 @@
 #custom-battery,
 #pulseaudio,
 #custom-mic,
+#custom-tts,
 #bluetooth,
 #custom-vortix,
 #custom-keyboard-layout,
@@ -75,6 +76,14 @@
 
 #custom-mic.muted {
   opacity: 0.5;
+}
+
+#custom-tts.off {
+  opacity: 0.5;
+}
+
+#custom-tts.forced {
+  color: #8ca6c0;
 }
 
 /* Battery <10% and discharging: hard red↔white blink.

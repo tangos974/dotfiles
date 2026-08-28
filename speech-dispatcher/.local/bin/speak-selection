@@ -1,0 +1,64 @@
+#!/bin/bash
+# Read the current text selection aloud through speech-dispatcher -> FastKoko.
+# Bound in hypr bindings.conf (SUPER+ALT+R reads, SUPER+ALT+SHIFT+R stops),
+# works from anywhere text can be highlighted. The Waybar custom/tts module
+# (tts-ctl) owns the state files honored here: off marker, preferred voice,
+# force-voice marker.
+#   speak-selection        read primary selection (clipboard fallback)
+#   speak-selection stop   stop speaking
+set -o pipefail
+PATH="/usr/bin:$PATH"
+
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/kokoro-tts"
+
+if [ "${1:-}" = "stop" ]; then
+  exec spd-say -C
+fi
+
+if [ -e "$STATE/off" ]; then
+  notify-send "Read aloud" "Off"
+  exit 0
+fi
+
+text=$(wl-paste --primary --no-newline 2>/dev/null) || text=""
+[ -n "$text" ] || text=$(wl-paste --no-newline 2>/dev/null) || text=""
+if [ -z "${text//[[:space:]]/}" ]; then
+  notify-send "Read aloud" "Nothing selected"
+  exit 0
+fi
+
+voice=$(cat "$STATE/voice" 2>/dev/null) || voice=af_heart
+
+if [ -e "$STATE/force" ]; then
+  spd-say -C  # replace any in-progress speech instead of queueing behind it
+  exec spd-say -y "$voice" -- "$text"
+fi
+
+# Crude language pick so French text gets the French voice: compare stopword
+# hit counts, default to English on a tie.
+fr=$(grep -oiwE "le|la|les|des|une|est|et|que|pour|dans|avec|sur|pas|vous|nous" <<<"$text" | wc -l)
+en=$(grep -oiwE "the|is|are|and|of|to|in|that|with|for|it|you|this|not" <<<"$text" | wc -l)
+lang=en
+[ "$fr" -gt "$en" ] && lang=fr
+
+# Voice ids encode language in their first letter (a/b = English, f = French,
+# ...). Use the picked voice when it matches the detected language, otherwise
+# the language default from kokoro.conf.
+case "${voice:0:1}" in
+  a | b) vlang=en ;;
+  e) vlang=es ;;
+  f) vlang=fr ;;
+  h) vlang=hi ;;
+  i) vlang=it ;;
+  j) vlang=ja ;;
+  p) vlang=pt ;;
+  z) vlang=zh ;;
+  *) vlang=en ;;
+esac
+
+spd-say -C  # replace any in-progress speech instead of queueing behind it
+if [ "$lang" = "$vlang" ]; then
+  exec spd-say -y "$voice" -- "$text"
+else
+  exec spd-say -l "$lang" -- "$text"
+fi

@@ -21,6 +21,12 @@ DOTFILES_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 
 . "$SCRIPT_DIR/dotfiles-stow.sh"
 
+# fcitx5 rewrites DefaultIM= in the profile on every layout switch. A clean
+# filter (see .gitattributes) normalizes that line so the churn never shows
+# up in git; filter registration is per-clone, hence done here.
+git -C "$DOTFILES_DIR" config filter.fcitx5-profile.clean \
+  "sed 's/^DefaultIM=.*/DefaultIM=keyboard-gb/'"
+
 stow_pkg fcitx5
 stow_pkg hypr
 stow_pkg waybar

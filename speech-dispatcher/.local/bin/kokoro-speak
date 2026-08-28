@@ -1,0 +1,27 @@
+#!/bin/bash
+# Speak stdin text via FastKoko (Kokoro-FastAPI, OpenAI-compatible TTS) on the
+# homelab inference box. Called by the speech-dispatcher generic module
+# (~/.config/speech-dispatcher/modules/kokoro.conf), but works standalone:
+#   echo "bonjour" | kokoro-speak ff_siwis
+#
+# $1 = FastKoko voice id (default af_heart)
+# $2 = rate as speed*100 (default 100; speechd passes 25..175, see kokoro.conf)
+set -o pipefail
+
+# speechd spawns modules with a minimal environment; prefer system binaries
+# over mise shims in either case.
+PATH="/usr/bin:$PATH"
+
+url="${KOKORO_TTS_URL:-http://inference.home:8880}"
+voice="${1:-af_heart}"
+rate="${2:-100}"
+speed=$(awk -v r="$rate" 'BEGIN { s = r/100; if (s < 0.25) s = 0.25; if (s > 4) s = 4; printf "%.2f", s }')
+
+# jq -Rs turns raw stdin into a JSON string, so quotes/newlines in the text
+# can't break the request body. Nothing may reach stdout (sd_generic hangs).
+jq -Rs --arg voice "$voice" --argjson speed "$speed" \
+    '{model: "kokoro", input: ., voice: $voice, speed: $speed, response_format: "mp3"}' |
+  curl -sf --connect-timeout 3 --max-time 300 \
+    -X POST "$url/v1/audio/speech" \
+    -H 'Content-Type: application/json' --data-binary @- |
+  mpv --no-config --really-quiet --no-video --keep-open=no - >/dev/null

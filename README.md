@@ -54,6 +54,7 @@ The master script invokes them in four phases (see `bin/master-installation.sh`)
 - `setup-systemd-lid-sleep.sh` — installs `/etc/systemd/{logind,sleep}.conf.d/` drop-ins for suspend-then-hibernate.
 - `setup-limine-quiet-boot.sh` — optional: edits `/boot/limine.conf` for a quieter boot screen (run manually).
 - `setup-mullvad-profiles.sh` / `setup-mullvad-policies.sh` — install Mullvad Browser configuration (see [Mullvad Browser profiles](#mullvad-browser-profiles)).
+- `install-speech-dispatcher.sh` — installs speech-dispatcher wired to homelab TTS (see [Text-to-speech (FastKoko)](#text-to-speech-fastkoko)).
 
 ## Hyprland helpers
 
@@ -110,6 +111,14 @@ Language runtimes and CLI tools are pinned with [mise](https://mise.jdx.dev). Th
 - **Web search** — `mcp/searxng_mcp.py` is a zero-dependency MCP stdio server fronting the homelab SearXNG; it backs the `websearch` tool the agents use instead of guessing URLs.
 - **Browser (Playwright)** — the `browser` agent drives headless Chromium via the `playwright` MCP (`npx @playwright/mcp`, version-pinned). Only the registration is in `opencode.json`; node (provided by mise) and the Chromium binaries in `~/.cache/ms-playwright` are large/mutable and not committed. `install-playwright.sh` (invoked by `setup-opencode.sh`) fetches them — the principle: track the install step, not the artifact.
 - **Stealth browser** — runs as a **remote MCP served from the homelab** (Camoufox in a container), not on this desktop. It's registered in `opencode.json` as a `type: remote` server and allowed on the `browser` agent, but `enabled: false` with a placeholder URL until the homelab service exists — see `~/Homelab/stealth_browser_todo.md`. It replaces the old local Camoufox fetcher for bot-walled pages (Reddit / Cloudflare) that the headless Playwright `browser` agent gets blocked on.
+
+## Text-to-speech (FastKoko)
+
+System-wide TTS (`spd-say`, browser readers, Orca, anything speaking through speech-dispatcher) is served by FastKoko — the Kokoro-FastAPI container on the homelab inference box (`http://inference.home:8880`) — instead of a local synthesizer. The integration is speech-dispatcher's `sd_generic` module: no code, just config. The `speech-dispatcher/` package stows a thin `speechd.conf` (routes everything to the `kokoro` module), `modules/kokoro.conf` (voice map + rate scaling), and `~/.local/bin/kokoro-speak`, which builds the JSON request with `jq` (so quotes/newlines in the text can't break it), POSTs to the OpenAI-compatible `/v1/audio/speech` endpoint, and pipes the mp3 into `mpv`. speechd's −100…+100 rate maps onto the API's `speed` parameter via `GenericRateAdd`/`GenericRateMultiply` in `kokoro.conf`. Voices are per-language (`en` → `af_heart`, `fr` → `ff_siwis`, …): `spd-say -l fr "bonjour"` speaks French; `kokoro-speak` also works standalone on a pipe. `install-speech-dispatcher.sh` installs the packages and stows the config; if the inference box is down, speech fails silently (3 s connect timeout) rather than hanging.
+
+The everyday entry point is a keybinding, not the CLI: **SUPER+ALT+R** reads the highlighted text in any app (`speak-selection` takes the primary selection, falls back to the clipboard, and picks the French or English voice by comparing stopword counts); **SUPER+ALT+SHIFT+R** stops. This replaces in-browser read-aloud entirely — Mullvad's resist-fingerprinting disables the Web Speech API, and Chromium's speech-dispatcher backend never shipped in a usable state — which is why the Read Aloud extension was dropped from `mullvad-policies/policies.json`.
+
+The Waybar `custom/tts` module (usual oneshot poll: `tts-ctl status`, `interval: 30`, `signal: 15`) shows a speech icon: dimmed when read-aloud is off, voice name shown in blue when a voice is forced. Left click toggles on/off, middle click toggles forcing the picked voice over language auto-detect, right click opens a walker dmenu voice picker (fed from `spd-say -L`, so it always matches `kokoro.conf`, which lists only the French and American-English voices — the server has more). State is marker files under `~/.local/state/kokoro-tts/`, shared between `tts-ctl` and `speak-selection`; when unforced, the picked voice is used whenever its language matches the detected one, otherwise the language default applies.
 
 ## Stow conflict handling
 

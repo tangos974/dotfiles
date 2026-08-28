@@ -11,6 +11,7 @@
   "modules-center": ["hyprland/window", "clock", "custom/update", "custom/voxtype", "custom/screenrecording-indicator", "custom/idle-indicator", "custom/notification-silencing-indicator"],
   "modules-right": [
     "group/tray-expander",
+    "custom/tts",
     "custom/always-on",
     "custom/display",
     "custom/vortix",
@@ -188,6 +189,16 @@
     "signal": 11,
     "format": "{text}",
     "on-click": "/bin/bash -lc 'exec python3 \"$HOME/.config/waybar/scripts/mic-all.py\" toggle --osd'"
+  },
+  "custom/tts": {
+    "interval": 30,
+    "signal": 15,
+    "return-type": "json",
+    "exec": "/bin/bash -lc 'exec \"$HOME/.local/bin/tts-ctl\" status'",
+    "format": "{text}",
+    "on-click": "/bin/bash -lc 'exec \"$HOME/.local/bin/tts-ctl\" toggle'",
+    "on-click-middle": "/bin/bash -lc 'exec \"$HOME/.local/bin/tts-ctl\" force'",
+    "on-click-right": "/bin/bash -lc 'exec \"$HOME/.local/bin/tts-ctl\" voice'"
   },
   "pulseaudio": {
     "format": "{icon}",

@@ -1,0 +1,75 @@
+#!/bin/bash
+# Waybar control for read-aloud (speech-dispatcher -> FastKoko), custom/tts.
+#   tts-ctl status   oneshot Waybar JSON (interval + signal poll, no daemon)
+#   tts-ctl toggle   read-aloud on/off (off also cancels current speech)
+#   tts-ctl force    toggle forcing the picked voice over language auto-detect
+#   tts-ctl voice    pick the preferred voice (walker dmenu over spd-say -L)
+# State is plain marker/content files under ~/.local/state/kokoro-tts/, read
+# by speak-selection.
+set -o pipefail
+PATH="/usr/bin:$PATH"
+
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/kokoro-tts"
+mkdir -p "$STATE"
+SIGNAL=15  # keep in sync with custom/tts in waybar config.jsonc
+
+ICON_ON=$'\U000F050A'   # nf-md-text_to_speech
+ICON_OFF=$'\U000F050B'  # nf-md-text_to_speech_off
+
+voice() { cat "$STATE/voice" 2>/dev/null || echo af_heart; }
+refresh() { pkill -RTMIN+$SIGNAL waybar; }
+
+case "${1:-status}" in
+  status)
+    v=$(voice)
+    mode="auto fr/en"
+    [ -e "$STATE/force" ] && mode="forced"
+    tooltip="Read aloud: SUPER+ALT+R (stop: +SHIFT)
+Voice: $v ($mode)
+Left: on/off · Middle: force voice · Right: pick voice"
+    if [ -e "$STATE/off" ]; then
+      jq -cn --arg t "$ICON_OFF" '{text:$t, class:"off", tooltip:"Read aloud: off\nLeft click to enable"}'
+    elif [ -e "$STATE/force" ]; then
+      jq -cn --arg t "$ICON_ON $v" --arg tt "$tooltip" '{text:$t, class:"forced", tooltip:$tt}'
+    else
+      jq -cn --arg t "$ICON_ON" --arg tt "$tooltip" '{text:$t, class:"on", tooltip:$tt}'
+    fi
+    ;;
+  toggle)
+    if [ -e "$STATE/off" ]; then
+      rm -f "$STATE/off"
+      notify-send "Read aloud" "On\nSUPER+ALT+R to start or stop reading selected text"
+    else
+      touch "$STATE/off"
+      spd-say -C 2>/dev/null
+      notify-send "Read aloud" "Off"
+    fi
+    refresh
+    ;;
+  force)
+    if [ -e "$STATE/force" ]; then
+      rm -f "$STATE/force"
+      notify-send "Read aloud" "Auto voice by language (fr/en)"
+    else
+      touch "$STATE/force"
+      notify-send "Read aloud" "Voice forced: $(voice)"
+    fi
+    refresh
+    ;;
+  voice)
+    cur=$(voice)
+    sel=$(spd-say -L | awk -v cur="$cur" 'NR>1 {
+        mark = ($1 == cur) ? "● " : "  "
+        printf "%s%s  —  %s %s\n", mark, $1, $2, tolower($3)
+      }' |
+      omarchy-launch-walker --dmenu --width 340 --minheight 1 --maxheight 630 -p "Voice…" 2>/dev/null)
+    [ -n "$sel" ] || exit 0
+    v=$(sed 's/^[●[:space:]]*//' <<<"$sel" | awk '{print $1}')
+    printf %s "$v" >"$STATE/voice"
+    refresh
+    ;;
+  *)
+    echo "usage: tts-ctl [status|toggle|force|voice]" >&2
+    exit 2
+    ;;
+esac
