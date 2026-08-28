@@ -1,0 +1,5 @@
+# fcitx5 rewrites DefaultIM= on every layout switch; the clean filter
+# (registered per-clone by bin/setup-keyboard-layouts.sh) normalizes that
+# line so switching layouts doesn't dirty the repo. Real config changes
+# (adding/removing layouts) still show up.
+fcitx5/.config/fcitx5/profile filter=fcitx5-profile
